@@ -11,9 +11,6 @@ import click
 import pandas as pd
 
 
-from pprint import pprint
-
-
 # Global
 PICKS_PATH = "/input/picks/"
 QC_PATH = "/input/quality_control/"
@@ -21,47 +18,39 @@ OUTPUT_PATH = "/output/"
 DATA_PATH = None
 
 
-def get_output_file_path(suffix):
-    return DATA_PATH + OUTPUT_PATH + "output_" + suffix
+class DEFECT_RATE:
+    def __init__(self, picks_file_name, qc_file_name):
+        self.picks_file_name = picks_file_name
+        self.qc_file_name = qc_file_name
+        self.picks_file_path = DATA_PATH + PICKS_PATH + self.picks_file_name
+        self.qc_file_path = DATA_PATH + QC_PATH + self.qc_file_name
+        self.output_file_path = DATA_PATH + OUTPUT_PATH + "output_" + self.picks_file_name.split("_")[1]
+        self.total_orders = {}
+        self.defects_per_order = {}
+        self.defect_rate = {}
+        self.output_content = {}
+        self.picks_file_content = pd.read_csv(self.picks_file_path)
+        self.qc_file_content = pd.read_csv(self.qc_file_path)
 
+    def get_total_picks_per_order(self):
+        _total_orders = {}
+        for i in self.picks_file_content.groupby("order_id"):
+            _total_orders[list(i[1].order_id.to_dict().values())[0]] = len(i[1].order_id.to_dict().values())
+        self.total_orders = _total_orders
 
-def get_input_picks_file_path(name):
-    return DATA_PATH + PICKS_PATH + name
+    def get_defects_per_order(self):
+        _defects_per_order = {}
+        for i in self.qc_file_content.groupby("order_id"):
+            _defects_per_order[set(i[1].order_id.to_dict().values()).pop()] = list(
+                i[1].defect.to_dict().values()
+            ).count(1)
+        self.defects_per_order = _defects_per_order
 
-
-def get_input_qc_file_path(name):
-    return DATA_PATH + QC_PATH + name
-
-
-def get_total_picks_per_order(picks_file):
-    picks_file_content = pd.read_csv(get_input_picks_file_path(picks_file))
-    total_orders = {}
-    for i in picks_file_content.groupby("order_id"):
-        total_orders[list(i[1].order_id.to_dict().values())[0]] = len(i[1].order_id.to_dict().values())
-    return total_orders
-
-
-def get_defects_per_order(qc_file):
-    qc_file_content = pd.read_csv(get_input_qc_file_path(qc_file))
-    defects_per_order = {}
-    for i in qc_file_content.groupby("order_id"):
-        defects_per_order[set(i[1].order_id.to_dict().values()).pop()] = list(i[1].defect.to_dict().values()).count(1)
-    return defects_per_order
-
-
-def calculate_defects_rate(total_orders, defects_per_order):
-    defects_rate = {}
-    for k, v in defects_per_order.items():
-        defects_rate[k] = str(v / total_orders.get(k) * 100)[:5] + "%"
-    return defects_rate
-
-
-def generate_output(picks_file, qc_file):
-    output_file_path = get_output_file_path(picks_file.split("_")[1])
-    total_orders = get_total_picks_per_order(picks_file)
-    defects_per_order = get_defects_per_order(qc_file)
-    defects_rate = calculate_defects_rate(total_orders, defects_per_order)
-    pprint(defects_rate)
+    def calculate_defects_rate(self):
+        _defects_rate = {}
+        for k, v in self.defects_per_order.items():
+            _defects_rate[k] = str(v / self.total_orders.get(k) * 100)[:5] + "%"
+        self.defect_rate = _defects_rate
 
 
 def generate_defect_rates():
@@ -69,7 +58,11 @@ def generate_defect_rates():
     qc = DATA_PATH + QC_PATH
     for picks_files, qc_files in zip(os.walk(picks), os.walk(qc)):
         for picks_file, qc_file in zip(picks_files[-1], qc_files[-1]):
-            generate_output(picks_file, qc_file)
+            dr_obj = DEFECT_RATE(picks_file, qc_file)
+            dr_obj.get_total_picks_per_order()
+            dr_obj.get_defects_per_order()
+            dr_obj.calculate_defects_rate()
+
 
 @click.command()
 @click.option(
