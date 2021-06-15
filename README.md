@@ -28,9 +28,13 @@ timeframe.
 
 
 ## To prepare the Environment
-#### Run
 - `pip3 install -r requirements.txt`
 
 ## To Test
-#### Run
 - `pytest -v`
+
+## For Help
+- `python3 calculate_defect_rate.py --help`
+
+## To Execute
+- `python3 calculate_defect_rate.py --data_path ./data`
