@@ -24,11 +24,14 @@ DATA_PATH = None
 def get_output_file_path(suffix):
     return DATA_PATH + OUTPUT_PATH + "output_" + suffix
 
+
 def get_input_picks_file_path(name):
     return DATA_PATH + PICKS_PATH + name
 
+
 def get_input_qc_file_path(name):
     return DATA_PATH + QC_PATH + name
+
 
 def get_total_picks_per_order(picks_file):
     picks_file_content = pd.read_csv(get_input_picks_file_path(picks_file))
@@ -37,18 +40,29 @@ def get_total_picks_per_order(picks_file):
         total_orders[list(i[1].order_id.to_dict().values())[0]] = len(i[1].order_id.to_dict().values())
     return total_orders
 
+
 def get_defects_per_order(qc_file):
     qc_file_content = pd.read_csv(get_input_qc_file_path(qc_file))
     defects_per_order = {}
     for i in qc_file_content.groupby("order_id"):
-        defects_per_order[set(i[1].order_id.to_dict().values()).pop()] = list(
-            i[1].defect.to_dict().values()
-        ).count(1)
+        defects_per_order[set(i[1].order_id.to_dict().values()).pop()] = list(i[1].defect.to_dict().values()).count(1)
     return defects_per_order
 
+
+def calculate_defects_rate(total_orders, defects_per_order):
+    defects_rate = {}
+    for k, v in defects_per_order.items():
+        defects_rate[k] = str(v / total_orders.get(k) * 100)[:5] + "%"
+    return defects_rate
+
+
 def generate_output(picks_file, qc_file):
-    pprint(get_total_picks_per_order(picks_file))
-    pprint(get_defects_per_order(qc_file))
+    output_file_path = get_output_file_path(picks_file.split("_")[1])
+    total_orders = get_total_picks_per_order(picks_file)
+    defects_per_order = get_defects_per_order(qc_file)
+    defects_rate = calculate_defects_rate(total_orders, defects_per_order)
+    pprint(defects_rate)
+
 
 def generate_defect_rates():
     picks = DATA_PATH + PICKS_PATH
@@ -56,7 +70,6 @@ def generate_defect_rates():
     for picks_files, qc_files in zip(os.walk(picks), os.walk(qc)):
         for picks_file, qc_file in zip(picks_files[-1], qc_files[-1]):
             generate_output(picks_file, qc_file)
-            
 
 @click.command()
 @click.option(
