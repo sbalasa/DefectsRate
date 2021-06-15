@@ -1,37 +1,43 @@
-## Welcome to GitHub Pages
+# DefectsRate
+To calculate defect rate in production line fulfilment centers (FC) for quality control.
 
-You can use the [editor on GitHub](https://github.com/sbalasa/DefectsRate/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Define Defect Rate
+The term defect rate designates the portion of defective elements in relation to all items produced. The rate is deduced by dividing the number of defective elements by the number of non-defective elements
 
-### Markdown
+### Task
+For this coding challenge we have prepared some sample data in the form of two csv’s representing data coming from one FC. One of the files (data/input/picks/pick_1.csv)
+contains pick events, the other file (data/input/quality_control/qc_1.csv) contains information about which order (= box) and ingredient was checked and if it had a defect or not. We would like to know the defect rate per section over time. It is your task to write an application which reads all input files, processes them and
+outputs a csv file containing a dataset consisting of the defect rate, section and
+timeframe.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Solution Proposal
+- The goal of the business is to have defect free orders, so orders placed by the customers are the prime factor in the production line. 
 
-```markdown
-Syntax highlighted code block
+- The more the orders the more the profits, else less. Identifying defects for all the orders aren't practical so selected few are tested for quality control.
 
-# Header 1
-## Header 2
-### Header 3
+- `Defect Rate per order = (Defective Ingredients found per order / Total Picked Ingredients per order) in %`
 
-- Bulleted
-- List
+- By calculating the defect rate with order_id as a base pointer provides us insights to determine the necessary business actions to avoid the defects. 
 
-1. Numbered
-2. List
+- Insights like, which order has highest defect rate, for what ingredients at which zones on what time.
 
-**Bold** and _Italic_ and `Code` text
+- Based on these insights, necessary Business actions can be made to decrease the defect rate. 
 
-[Link](url) and ![Image](src)
-```
+- These analysis help the right project line manager to observe why certain ingredients are having defects or if there are any human errors in a particular zone etc.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
+## To prepare the Environment
+- `pip3 install -r requirements.txt`
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/sbalasa/DefectsRate/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## To Test
+- `pytest -v`
 
-### Support or Contact
+## For Help
+- `python3 calculate_defect_rate.py --help`
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+## To Execute
+- `python3 calculate_defect_rate.py --data_path ./data`
+
+## Solution Output
+![Output File](./output_solution.png)
