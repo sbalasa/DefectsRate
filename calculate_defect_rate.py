@@ -46,11 +46,27 @@ class DEFECT_RATE:
             ).count(1)
         self.defects_per_order = _defects_per_order
 
-    def calculate_defects_rate(self):
-        _defects_rate = {}
+    def calculate_defect_rate(self):
+        _defect_rate = {}
         for k, v in self.defects_per_order.items():
-            _defects_rate[k] = str(v / self.total_orders.get(k) * 100)[:5] + "%"
-        self.defect_rate = _defects_rate
+            _defect_rate[k] = str(v / self.total_orders.get(k) * 100)[:5] + "%"
+        self.defect_rate = _defect_rate
+
+    def generate_output(self):
+        for i in self.picks_file_content.groupby("order_id"):
+            _order_id = list(i[1].order_id.to_dict().values())[0]
+            _ingredient_id = ",".join(map(str, set(i[1].ingredient_id.to_dict().values())))
+            _defect_rate = self.defect_rate.get(_order_id, "0.0%")
+            _zone_id = ",".join(map(str, set(i[1].zone_id.to_dict().values())))
+            _time = list(i[1].created_at.to_dict().values())
+            _timeframe = f"{min(_time)} - {max(_time)}"
+            self.output_content[_order_id] = [_order_id, _ingredient_id, _defect_rate, _zone_id, _timeframe]
+        output = pd.DataFrame.from_dict(
+            self.output_content,
+            orient="index",
+            columns=["Order ID", "Ingredients", "Defect Rate", "Section", "Time Frame"],
+        )
+        output.to_csv(self.output_file_path)
 
 
 def generate_defect_rates():
@@ -61,7 +77,8 @@ def generate_defect_rates():
             dr_obj = DEFECT_RATE(picks_file, qc_file)
             dr_obj.get_total_picks_per_order()
             dr_obj.get_defects_per_order()
-            dr_obj.calculate_defects_rate()
+            dr_obj.calculate_defect_rate()
+            dr_obj.generate_output()
 
 
 @click.command()

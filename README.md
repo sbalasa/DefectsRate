@@ -38,3 +38,6 @@ timeframe.
 
 ## To Execute
 - `python3 calculate_defect_rate.py --data_path ./data`
+
+## Solution Output
+![Output File](./output_solution.png)
