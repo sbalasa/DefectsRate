@@ -20,7 +20,7 @@ DATA_PATH = None
 
 class DEFECT_RATE:
     """
-    This class is the main data structure used calculate defect rate in production line FC.
+    This class is the main data structure used to calculate defect rate in production line FC.
     """
 
     def __init__(self, picks_file_name, qc_file_name):
