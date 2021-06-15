@@ -6,13 +6,8 @@ To calculate defect rate in production line fulfilment centers (FC) for quality 
 The term defect rate designates the portion of defective elements in relation to all items produced. The rate is deduced by dividing the number of defective elements by the number of non-defective elements
 
 ### Task
-For this coding challenge we have prepared some sample data in the form of two csv’s
-representing data coming from one FC. One of the files (data/input/picks/pick_1.csv)
-contains pick events, the other file (data/input/quality_control/qc_1.csv) contains
-information about which order (= box) and ingredient was checked and if it had a defect
-or not.
-We would like to know the defect rate per section over time.
-It is your task to write an application which reads all input files, processes them and
+For this coding challenge we have prepared some sample data in the form of two csv’s representing data coming from one FC. One of the files (data/input/picks/pick_1.csv)
+contains pick events, the other file (data/input/quality_control/qc_1.csv) contains information about which order (= box) and ingredient was checked and if it had a defect or not. We would like to know the defect rate per section over time. It is your task to write an application which reads all input files, processes them and
 outputs a csv file containing a dataset consisting of the defect rate, section and
 timeframe.
 
@@ -33,5 +28,9 @@ timeframe.
 
 
 ## To prepare the Environment
-`pip3 install -r requirements.txt`
+#### Run
+- `pip3 install -r requirements.txt`
 
+## To Test
+#### Run
+- `pytest -v`
